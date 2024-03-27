@@ -21,7 +21,7 @@ async function bootstrap() {
   // ╚═╗║║║╠═╣║ ╦║ ╦║╣ ╠╦╝
   // ╚═╝╚╩╝╩ ╩╚═╝╚═╝╚═╝╩╚═
   const options = new DocumentBuilder()
-    .setTitle('AP finIA')
+    .setTitle('API finIA')
     .setDescription('Servicios API backend de finIA')
     .setVersion('1.0')
     .addTag('API')
