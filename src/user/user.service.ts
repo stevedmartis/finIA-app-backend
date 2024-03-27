@@ -59,6 +59,8 @@ export class UserService {
     // ┴─┘└─┘└─┘┴┘└┘
     async login(req: Request, loginUserDto: LoginUserDto) {
         const user = await this.findUserByEmail(loginUserDto.email);
+
+        console.log('found', user)
         this.isUserBlocked(user);
         await this.checkPassword(loginUserDto.password, user);
         await this.passwordsAreMatch(user);

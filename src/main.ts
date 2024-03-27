@@ -21,8 +21,8 @@ async function bootstrap() {
   // ╚═╗║║║╠═╣║ ╦║ ╦║╣ ╠╦╝
   // ╚═╝╚╩╝╩ ╩╚═╝╚═╝╚═╝╩╚═
   const options = new DocumentBuilder()
-    .setTitle('API')
-    .setDescription('API description')
+    .setTitle('AP finIA')
+    .setDescription('Servicios API backend de finIA')
     .setVersion('1.0')
     .addTag('API')
     .build();
@@ -30,7 +30,7 @@ async function bootstrap() {
     include: [
       UserModule,
       ArticleModule,
-  ],
+    ],
   });
   SwaggerModule.setup('api', app, document);
 
