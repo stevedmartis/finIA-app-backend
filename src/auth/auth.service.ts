@@ -10,6 +10,7 @@ import { v4 } from 'uuid';
 import { Request } from 'express';
 import { getClientIp } from 'request-ip';
 import * as Cryptr from 'cryptr';
+import { FloidWidgetResponseDto } from 'src/user/dto/floid-widget.dto';
 
 @Injectable()
 export class AuthService {
@@ -84,8 +85,9 @@ export class AuthService {
     return token;
   }
 
-  async authFloid(floidResp: any): Promise<any> {
+  async authFloid(floidResp: FloidWidgetResponseDto): Promise<any> {
 
+    console.log('floidResp', floidResp);
     const jsonString = JSON.stringify(floidResp, null, 2);
     console.log('floidResp json:', jsonString);
 

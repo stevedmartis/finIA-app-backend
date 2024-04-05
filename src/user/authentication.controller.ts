@@ -11,6 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { FloidWidgetResponseDto } from './dto/floid-widget.dto';
 
 @ApiTags('Auth')
 @Controller('callbackurl')
@@ -27,7 +28,7 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Auth Floid user' })
     @ApiCreatedResponse({})
-    async authFloidWidget(@Body() authFloid: any) {
+    async authFloidWidget(@Body() authFloid: FloidWidgetResponseDto) {
         return await this.authService.authFloid(authFloid);
     }
 
