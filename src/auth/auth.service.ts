@@ -85,7 +85,9 @@ export class AuthService {
   }
 
   async authFloid(floidResp: any): Promise<any> {
-    console.log('floidResp', this.imprimirObjeto(floidResp))
+
+    const jsonString = JSON.stringify(floidResp, null, 2);
+    console.log('floidResp json:', jsonString);
 
 
     if (!floidResp) {
