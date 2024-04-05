@@ -26,7 +26,7 @@ export class AuthService {
 
   async createAccessToken(userId: string) {
     // const accessToken = this.jwtService.sign({userId});
-    const accessToken = sign({userId}, process.env.JWT_SECRET , { expiresIn: process.env.JWT_EXPIRATION });
+    const accessToken = sign({ userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
     return this.encryptText(accessToken);
   }
 
@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   async findRefreshToken(token: string) {
-    const refreshToken = await this.refreshTokenModel.findOne({refreshToken: token});
+    const refreshToken = await this.refreshTokenModel.findOne({ refreshToken: token });
     if (!refreshToken) {
       throw new UnauthorizedException('User has been logged out.');
     }
@@ -51,7 +51,7 @@ export class AuthService {
   }
 
   async validateUser(jwtPayload: JwtPayload): Promise<any> {
-    const user = await this.userModel.findOne({_id: jwtPayload.userId, verified: true});
+    const user = await this.userModel.findOne({ _id: jwtPayload.userId, verified: true });
     if (!user) {
       throw new UnauthorizedException('User not found.');
     }
@@ -64,15 +64,15 @@ export class AuthService {
   private jwtExtractor(request) {
     let token = null;
     if (request.header('x-token')) {
-    token = request.get('x-token');
-  } else if (request.headers.authorization) {
-    token = request.headers.authorization.replace('Bearer ', '').replace(' ', '');
-  } else if (request.body.token) {
-    token = request.body.token.replace(' ', '');
-  }
+      token = request.get('x-token');
+    } else if (request.headers.authorization) {
+      token = request.headers.authorization.replace('Bearer ', '').replace(' ', '');
+    } else if (request.body.token) {
+      token = request.body.token.replace(' ', '');
+    }
     if (request.query.token) {
-    token = request.body.token.replace(' ', '');
-  }
+      token = request.body.token.replace(' ', '');
+    }
     const cryptr = new Cryptr(process.env.ENCRYPT_JWT_SECRET);
     if (token) {
       try {
@@ -80,9 +80,17 @@ export class AuthService {
       } catch (err) {
         throw new BadRequestException('Bad request.');
       }
-  }
+    }
     return token;
-}
+  }
+
+  async authFloid(floidResp: any): Promise<any> {
+    console.log('floidResp', floidResp)
+    if (!floidResp) {
+      throw new UnauthorizedException('User not found.');
+    }
+    return floidResp;
+  }
 
   // ***********************
   // ╔╦╗╔═╗╔╦╗╦ ╦╔═╗╔╦╗╔═╗
