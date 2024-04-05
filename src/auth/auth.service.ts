@@ -85,11 +85,31 @@ export class AuthService {
   }
 
   async authFloid(floidResp: any): Promise<any> {
-    console.log('floidResp', floidResp)
+    console.log('floidResp', this.imprimirObjeto(floidResp))
+
+
     if (!floidResp) {
       throw new UnauthorizedException('User not found.');
     }
     return floidResp;
+  }
+
+  imprimirObjeto(obj: any, nivel: number = 0) {
+    // Iterar sobre las claves del objeto
+    for (let key in obj) {
+      // Calcular el espacio de sangrado
+      let sangrado = ' '.repeat(nivel * 2);
+      // Imprimir la clave y su valor
+      console.log(`${sangrado}${key}:`);
+      // Verificar si el valor es un objeto
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        // Si es un objeto, llamar recursivamente a la función para imprimirlo
+        this.imprimirObjeto(obj[key], nivel + 1);
+      } else {
+        // Si no es un objeto, imprimir el valor
+        console.log(`${sangrado}  ${obj[key]}`);
+      }
+    }
   }
 
   // ***********************
