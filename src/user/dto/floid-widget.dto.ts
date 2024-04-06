@@ -123,8 +123,6 @@ class FloidWidgetResponseDto {
     income: IncomeDto;
 }
 
-
-
 class ProductsAccountDto {
     @IsString()
     type: string;
