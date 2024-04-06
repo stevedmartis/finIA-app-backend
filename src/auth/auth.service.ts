@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { getClientIp } from 'request-ip';
 import * as Cryptr from 'cryptr';
 import { FloidWidgetResponseDto } from 'src/user/dto/floid-widget.dto';
+import { validate, ValidationError } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -85,35 +86,32 @@ export class AuthService {
     return token;
   }
 
-  async authFloid(floidResp: FloidWidgetResponseDto): Promise<any> {
+  async authFloid(authFloid: FloidWidgetResponseDto): Promise<void> {
+    try {
+      const errors = await this.validateDto(authFloid);
+      if (errors.length > 0) {
+        const errorMessage = this.formatValidationError(errors);
+        throw new Error(`Los datos proporcionados no son válidos: ${errorMessage}`);
+      }
 
-    console.log('floidResp', floidResp);
-    const jsonString = JSON.stringify(floidResp, null, 2);
-    console.log('floidResp json:', jsonString);
-
-
-    if (!floidResp) {
-      throw new UnauthorizedException('User not found.');
+      // Lógica de autenticación aquí
+      const jsonString = JSON.stringify(authFloid, null, 2);
+      console.log('Autenticación Floid exitosa:', jsonString);
+    } catch (error) {
+      // Manejo de errores
+      console.error('Error en la autenticación Floid:', error);
+      throw error;
     }
-    return floidResp;
   }
 
-  imprimirObjeto(obj: any, nivel: number = 0) {
-    // Iterar sobre las claves del objeto
-    for (let key in obj) {
-      // Calcular el espacio de sangrado
-      let sangrado = ' '.repeat(nivel * 2);
-      // Imprimir la clave y su valor
-      console.log(`${sangrado}${key}:`);
-      // Verificar si el valor es un objeto
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
-        // Si es un objeto, llamar recursivamente a la función para imprimirlo
-        this.imprimirObjeto(obj[key], nivel + 1);
-      } else {
-        // Si no es un objeto, imprimir el valor
-        console.log(`${sangrado}  ${obj[key]}`);
-      }
-    }
+  private async validateDto(dto: any): Promise<ValidationError[]> {
+    // Utiliza la función validate de class-validator para validar el DTO
+    return await validate(dto);
+  }
+
+  private formatValidationError(errors: ValidationError[]): string {
+    // Formatea los mensajes de error para que sean más legibles
+    return errors.map(error => Object.values(error.constraints).join(', ')).join('; ');
   }
 
   // ***********************

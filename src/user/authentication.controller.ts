@@ -29,7 +29,18 @@ export class AuthController {
     @ApiOperation({ summary: 'Auth Floid user' })
     @ApiCreatedResponse({})
     async authFloidWidget(@Body() authFloid: FloidWidgetResponseDto) {
-        return await this.authService.authFloid(authFloid);
+        try {
+
+            // Llama al método del servicio y pasa el DTO como argumento
+            await this.authService.authFloid(authFloid);
+
+            // Si el método del servicio se ejecuta correctamente, retorna un mensaje de éxito
+            return { success: true, message: 'Autenticación exitosa' };
+        } catch (error) {
+            // Manejo de errores
+            console.error('Error en la autenticación Floid:', error);
+            throw error;
+        }
     }
 
 

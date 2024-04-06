@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsEnum, IsDate, ValidateNested, ArrayMinSize, ArrayNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsEnum, ValidateNested, ArrayMinSize, ArrayNotEmpty } from 'class-validator';
 import { Type as ClassType } from 'class-transformer'; // Renombramos el import a ClassType
 
 enum Sender {
@@ -38,8 +38,8 @@ class IncomeByMonthDto {
     @IsNumber()
     extra: number;
 
-    @IsDate()
-    date: Date;
+    @IsString()
+    date: string; // Cambiado a tipo string
 
     @ValidateNested({ each: true })
     @ClassType(() => SourceDto)
@@ -174,8 +174,6 @@ class LineDto {
     available: number;
 }
 
-
-
 class TransactionsAccountDto {
     @IsNumber()
     account_number: number;
@@ -187,8 +185,8 @@ class TransactionsAccountDto {
 }
 
 class TransactionDto {
-    @IsDate()
-    date: Date;
+    @IsString()
+    date: string; // Cambiado a tipo string
 
     @IsString()
     branch: string;
@@ -211,8 +209,6 @@ class TransactionDto {
     @IsString()
     id: string;
 }
-
-
 
 export {
     FloidWidgetResponseDto,
