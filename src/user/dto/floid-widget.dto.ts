@@ -72,6 +72,37 @@ class IncomeAccountDto {
     incomeByMonth: IncomeByMonthDto[];
 }
 
+class ProductsDto {
+    @ValidateNested({ each: true })
+    @ClassType(() => ProductsAccountDto)
+    @ArrayMinSize(1)
+    accounts: ProductsAccountDto[];
+
+    @ValidateNested({ each: true })
+    @ClassType(() => CardDto)
+    @ArrayMinSize(1)
+    cards: CardDto[];
+
+    @ValidateNested({ each: true })
+    @ClassType(() => LineDto)
+    @ArrayMinSize(1)
+    lines: LineDto[];
+}
+
+class TransactionsDto {
+    @ValidateNested({ each: true })
+    @ClassType(() => TransactionsAccountDto)
+    @ArrayMinSize(1)
+    accounts: TransactionsAccountDto[];
+}
+
+class IncomeDto {
+    @ValidateNested({ each: true })
+    @ClassType(() => IncomeAccountDto)
+    @ArrayNotEmpty()
+    accounts: IncomeAccountDto[];
+}
+
 class FloidWidgetResponseDto {
     @IsString()
     consumerId: string;
@@ -92,22 +123,7 @@ class FloidWidgetResponseDto {
     income: IncomeDto;
 }
 
-class ProductsDto {
-    @ValidateNested({ each: true })
-    @ClassType(() => ProductsAccountDto)
-    @ArrayMinSize(1)
-    accounts: ProductsAccountDto[];
 
-    @ValidateNested({ each: true })
-    @ClassType(() => CardDto)
-    @ArrayMinSize(1)
-    cards: CardDto[];
-
-    @ValidateNested({ each: true })
-    @ClassType(() => LineDto)
-    @ArrayMinSize(1)
-    lines: LineDto[];
-}
 
 class ProductsAccountDto {
     @IsString()
@@ -160,12 +176,7 @@ class LineDto {
     available: number;
 }
 
-class TransactionsDto {
-    @ValidateNested({ each: true })
-    @ClassType(() => TransactionsAccountDto)
-    @ArrayMinSize(1)
-    accounts: TransactionsAccountDto[];
-}
+
 
 class TransactionsAccountDto {
     @IsNumber()
@@ -203,12 +214,7 @@ class TransactionDto {
     id: string;
 }
 
-class IncomeDto {
-    @ValidateNested({ each: true })
-    @ClassType(() => IncomeAccountDto)
-    @ArrayNotEmpty()
-    accounts: IncomeAccountDto[];
-}
+
 
 export {
     FloidWidgetResponseDto,
