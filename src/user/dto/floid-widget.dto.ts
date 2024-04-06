@@ -1,5 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsEnum, ValidateNested, ArrayMinSize, ArrayNotEmpty } from 'class-validator';
-import { Type as ClassType } from 'class-transformer'; // Renombramos el import a ClassType
+import { Type as ClassType } from 'class-transformer';
 
 enum Sender {
     'ABONO DE CREDITO 29600179865' = 'ABONO DE CREDITO 29600179865',
@@ -15,203 +16,198 @@ enum Type {
 }
 
 class SourceDto {
-    @IsEnum(Sender)
+    @ApiProperty({ enum: Sender })
     sender: Sender;
 
-    @IsNumber()
+    @ApiProperty()
     amount: number;
 
-    @IsEnum(Type)
+    @ApiProperty({ enum: Type })
     type: Type;
 }
 
 class IncomeByMonthDto {
-    @IsString()
+    @ApiProperty()
     month: string;
 
-    @IsNumber()
+    @ApiProperty()
     total: number;
 
-    @IsNumber()
+    @ApiProperty()
     main: number;
 
-    @IsNumber()
+    @ApiProperty()
     extra: number;
 
-    @IsString()
-    date: string; // Cambiado a tipo string
+    @ApiProperty()
+    date: string;
 
     @ValidateNested({ each: true })
-    @ClassType(() => SourceDto)
-    @ArrayMinSize(1)
+    @ApiProperty({ type: [SourceDto] })
     sources: SourceDto[];
 }
 
 class IncomeAccountDto {
-    @IsNumber()
+    @ApiProperty()
     account_number: number;
 
-    @IsString()
+    @ApiProperty()
     regularity: string;
 
-    @IsNumber()
+    @ApiProperty()
     totalAverage: number;
 
-    @IsNumber()
+    @ApiProperty()
     mainAverage: number;
 
-    @IsNumber()
+    @ApiProperty()
     extraAverage: number;
 
-    @IsString()
+    @ApiProperty()
     mainIncomeDeposit: string;
 
     @ValidateNested({ each: true })
-    @ClassType(() => IncomeByMonthDto)
-    @ArrayMinSize(1)
+    @ApiProperty({ type: [IncomeByMonthDto] })
     incomeByMonth: IncomeByMonthDto[];
 }
 
+class ProductsAccountDto {
+    @ApiProperty()
+    type: string;
+
+    @ApiProperty()
+    number: number;
+
+    @ApiProperty()
+    currency: string;
+
+    @ApiProperty()
+    balance: number;
+}
+
+class LineDto {
+    @ApiProperty()
+    number: number;
+
+    @ApiProperty()
+    currency: string;
+
+    @ApiProperty()
+    total: number;
+
+    @ApiProperty()
+    used: number;
+
+    @ApiProperty()
+    available: number;
+}
+
+
+class CardDto {
+    @ApiProperty()
+    number: string;
+
+    @ApiProperty()
+    currency: string;
+
+    @ApiProperty()
+    total: number;
+
+    @ApiProperty()
+    used: number;
+
+    @ApiProperty()
+    available: number;
+
+    @ApiProperty()
+    name: string;
+}
+
+
+class TransactionDto {
+    @ApiProperty()
+    date: string;
+
+    @ApiProperty()
+    branch: string;
+
+    @ApiProperty()
+    description: string;
+
+    @ApiProperty()
+    doc_number: string;
+
+    @ApiProperty()
+    out: number;
+
+    @ApiProperty()
+    in: number;
+
+    @ApiProperty()
+    balance: number;
+
+    @ApiProperty()
+    id: string;
+}
+
+class TransactionsAccountDto {
+    @ApiProperty()
+    account_number: number;
+
+    @ValidateNested({ each: true })
+    @ApiProperty({ type: [TransactionDto] })
+    transactions: TransactionDto[];
+}
+
+
 class ProductsDto {
     @ValidateNested({ each: true })
-    @ClassType(() => ProductsAccountDto)
-    @ArrayMinSize(1)
+    @ApiProperty({ type: [ProductsAccountDto] })
     accounts: ProductsAccountDto[];
 
     @ValidateNested({ each: true })
-    @ClassType(() => CardDto)
-    @ArrayMinSize(1)
+    @ApiProperty({ type: [CardDto] })
     cards: CardDto[];
 
     @ValidateNested({ each: true })
-    @ClassType(() => LineDto)
-    @ArrayMinSize(1)
+    @ApiProperty({ type: [LineDto] })
     lines: LineDto[];
 }
 
 class TransactionsDto {
     @ValidateNested({ each: true })
-    @ClassType(() => TransactionsAccountDto)
-    @ArrayMinSize(1)
+    @ApiProperty({ type: [TransactionsAccountDto] })
     accounts: TransactionsAccountDto[];
 }
 
 class IncomeDto {
     @ValidateNested({ each: true })
-    @ClassType(() => IncomeAccountDto)
-    @ArrayNotEmpty()
+    @ApiProperty({ type: [IncomeAccountDto] })
     accounts: IncomeAccountDto[];
 }
 
-class FloidWidgetResponseDto {
-    @IsString()
+class AccountFloidWidgetDto {
+    @ApiProperty()
     consumerId: string;
 
-    @IsString()
+    @ApiProperty()
     caseid: string;
 
     @ValidateNested()
-    @ClassType(() => ProductsDto)
+    @ApiProperty({ type: ProductsDto })
     products: ProductsDto;
 
     @ValidateNested()
-    @ClassType(() => TransactionsDto)
+    @ApiProperty({ type: TransactionsDto })
     transactions: TransactionsDto;
 
     @ValidateNested()
-    @ClassType(() => IncomeDto)
+    @ApiProperty({ type: IncomeDto })
     income: IncomeDto;
 }
 
-class ProductsAccountDto {
-    @IsString()
-    type: string;
-
-    @IsNumber()
-    number: number;
-
-    @IsString()
-    currency: string;
-
-    @IsNumber()
-    balance: number;
-}
-
-class CardDto {
-    @IsString()
-    number: string;
-
-    @IsString()
-    currency: string;
-
-    @IsNumber()
-    total: number;
-
-    @IsNumber()
-    used: number;
-
-    @IsNumber()
-    available: number;
-
-    @IsString()
-    name: string;
-}
-
-class LineDto {
-    @IsNumber()
-    number: number;
-
-    @IsString()
-    currency: string;
-
-    @IsNumber()
-    total: number;
-
-    @IsNumber()
-    used: number;
-
-    @IsNumber()
-    available: number;
-}
-
-class TransactionsAccountDto {
-    @IsNumber()
-    account_number: number;
-
-    @ValidateNested({ each: true })
-    @ClassType(() => TransactionDto)
-    @ArrayMinSize(1)
-    transactions: TransactionDto[];
-}
-
-class TransactionDto {
-    @IsString()
-    date: string; // Cambiado a tipo string
-
-    @IsString()
-    branch: string;
-
-    @IsString()
-    description: string;
-
-    @IsString()
-    doc_number: string;
-
-    @IsNumber()
-    out: number;
-
-    @IsNumber()
-    in: number;
-
-    @IsNumber()
-    balance: number;
-
-    @IsString()
-    id: string;
-}
-
 export {
-    FloidWidgetResponseDto,
+    AccountFloidWidgetDto,
     IncomeAccountDto,
     IncomeByMonthDto,
     ProductsDto,

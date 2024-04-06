@@ -11,7 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AuthService } from 'src/auth/auth.service';
-import { FloidWidgetResponseDto } from './dto/floid-widget.dto';
+import { AccountFloidWidgetDto } from './dto/floid-widget.dto';
 
 @ApiTags('Auth')
 @Controller('callbackurl')
@@ -28,11 +28,11 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Auth Floid user' })
     @ApiCreatedResponse({})
-    async authFloidWidget(@Body() authFloid: FloidWidgetResponseDto) {
+    async authFloidWidget(@Body() authFloid: AccountFloidWidgetDto) {
         try {
 
             // Llama al método del servicio y pasa el DTO como argumento
-            await this.authService.authFloid(authFloid);
+            await this.authService.createAccountFloidWidget(authFloid);
 
             // Si el método del servicio se ejecuta correctamente, retorna un mensaje de éxito
             return { success: true, message: 'Autenticación exitosa' };

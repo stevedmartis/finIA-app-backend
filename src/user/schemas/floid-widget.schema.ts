@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 // Definir el esquema de Mongoose para Source
-const SourceSchema = new mongoose.Schema({
+export const SourceSchema = new mongoose.Schema({
     sender: { type: String, enum: ['ABONO DE CREDITO 29600179865', 'ABONO POR TRF DESDE OTRO BANCO EN LINEA', 'ABONO TERCEROS 12345678-0 A.PEREZ BAR', 'TRANSFER DE FLOW SPA', 'TRANSFER DE PEREZ'] },
     amount: { type: Number },
     type: { type: String, enum: ['extra', 'main'] }
 });
 
 // Definir el esquema de Mongoose para IncomeByMonth
-const IncomeByMonthSchema = new mongoose.Schema({
+export const IncomeByMonthSchema = new mongoose.Schema({
     month: { type: String },
     total: { type: Number },
     main: { type: Number },
@@ -18,7 +18,7 @@ const IncomeByMonthSchema = new mongoose.Schema({
 });
 
 // Definir el esquema de Mongoose para IncomeAccount
-const IncomeAccountSchema = new mongoose.Schema({
+export const IncomeAccountSchema = new mongoose.Schema({
     account_number: { type: Number },
     regularity: { type: String },
     totalAverage: { type: Number },
@@ -29,7 +29,7 @@ const IncomeAccountSchema = new mongoose.Schema({
 });
 
 // Definir el esquema de Mongoose para FloidWidgetResponse
-const FloidWidgetResponseSchema = new mongoose.Schema({
+export const FloidAccountWidgetSchema = new mongoose.Schema({
     consumerId: { type: String },
     caseid: { type: String },
     products: {
@@ -75,7 +75,3 @@ const FloidWidgetResponseSchema = new mongoose.Schema({
     }
 });
 
-// Crear el modelo de Mongoose para FloidWidgetResponse
-const FloidWidgetResponseModel = mongoose.model('FloidWidgetResponse', FloidWidgetResponseSchema);
-
-module.exports = FloidWidgetResponseModel;

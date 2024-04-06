@@ -6,6 +6,7 @@ import { UserService } from './user.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { ForgotPasswordSchema } from './schemas/forgot-password.schema';
 import { AuthController } from './authentication.controller';
+import { FloidAccountWidgetSchema, IncomeAccountSchema, SourceSchema } from './schemas/floid-widget.schema';
 
 @Module({
   imports: [

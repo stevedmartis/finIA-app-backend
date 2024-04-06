@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from 'src/user/schemas/user.schema';
 import { RefreshTokenSchema } from './schemas/refresh-token.schema';
+import { FloidAccountWidgetSchema, IncomeAccountSchema, SourceSchema } from 'src/user/schemas/floid-widget.schema';
 
 @Module({
   imports: [
@@ -13,6 +14,9 @@ import { RefreshTokenSchema } from './schemas/refresh-token.schema';
       { name: 'User', schema: UserSchema },
       { name: 'RefreshToken', schema: RefreshTokenSchema },
     ]),
+    MongooseModule.forFeature([{ name: 'FloidAccountWidget', schema: FloidAccountWidgetSchema }]),
+    MongooseModule.forFeature([{ name: 'IncomeAccount', schema: IncomeAccountSchema }]),
+    MongooseModule.forFeature([{ name: 'Source', schema: SourceSchema }]),
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -22,4 +26,4 @@ import { RefreshTokenSchema } from './schemas/refresh-token.schema';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }
