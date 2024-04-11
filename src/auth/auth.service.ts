@@ -9,15 +9,17 @@ import { RefreshToken } from './interfaces/refresh-token.interface';
 import { v4 } from 'uuid';
 import { Request } from 'express';
 import { getClientIp } from 'request-ip';
-import * as Cryptr from 'cryptr';
+import Cryptr from 'cryptr';
 import { AccountFloidWidgetDto } from 'src/user/dto/floid-widget.dto';
 import { validate, ValidationError } from 'class-validator';
 import { AccountFloidWidget } from 'src/user/interfaces/floid-widget';
+import Twilio from 'twilio';
 
 @Injectable()
 export class AuthService {
 
   cryptr: any;
+  twilioClient: any;
 
   constructor(
     @InjectModel('FloidAccountWidget') private readonly floidWidgetModel: Model<any>,
@@ -26,6 +28,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {
     this.cryptr = new Cryptr(process.env.ENCRYPT_JWT_SECRET);
+    this.twilioClient = Twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
   }
 
   async createAccessToken(userId: string) {
@@ -125,6 +128,17 @@ export class AuthService {
     return errors.map(error => Object.values(error.constraints).join(', ')).join('; ');
   }
 
+  async sendVerificationCode(phoneNumber: string, code: string): Promise<void> {
+    console.log(phoneNumber)
+    const message = await this.twilioClient.messages.create({
+      body: `Tu código de verificación es: ${code}`,
+      to: phoneNumber, // El número de teléfono del destinatario
+      from: process.env.TWILIO_PHONE_NUMBER, // Tu número de Twilio
+    });
+
+    console.log(message.sid);
+  }
+
   // ***********************
   // ╔╦╗╔═╗╔╦╗╦ ╦╔═╗╔╦╗╔═╗
   // ║║║║╣  ║ ╠═╣║ ║ ║║╚═╗
@@ -164,6 +178,8 @@ export class AuthService {
       throw new BadRequestException('Account most be unique.');
     }
   }
+
+
 
 }
 

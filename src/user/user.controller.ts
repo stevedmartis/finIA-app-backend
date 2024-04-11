@@ -18,6 +18,7 @@ import {
     ApiOperation,
 } from '@nestjs/swagger';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AuthService } from 'src/auth/auth.service';
 
 @ApiTags('User')
 @Controller('user')
@@ -105,4 +106,6 @@ export class UserController {
     findAll() {
         return this.userService.findAll();
     }
+
+
 }

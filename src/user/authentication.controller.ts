@@ -13,8 +13,8 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { AccountFloidWidgetDto } from './dto/floid-widget.dto';
 
-@ApiTags('Auth')
-@Controller('callbackurl')
+@ApiTags('Authentication')
+@Controller('auth')
 @UseGuards(RolesGuard)
 export class AuthController {
     constructor(
@@ -24,7 +24,7 @@ export class AuthController {
     // ╔═╗╦ ╦╔╦╗╦ ╦╔═╗╔╗╔╔╦╗╦╔═╗╔═╗╔╦╗╔═╗
     // ╠═╣║ ║ ║ ╠═╣║╣ ║║║ ║ ║║  ╠═╣ ║ ║╣
     // ╩ ╩╚═╝ ╩ ╩ ╩╚═╝╝╚╝ ╩ ╩╚═╝╩ ╩ ╩ ╚═╝
-    @Post()
+    @Post('callbackurl')
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Auth Floid user' })
     @ApiCreatedResponse({})
@@ -41,6 +41,17 @@ export class AuthController {
             console.error('Error en la autenticación Floid:', error);
             throw error;
         }
+    }
+
+
+    @Post('send-code')
+    @HttpCode(HttpStatus.CREATED)
+    @ApiOperation({ summary: 'A private route for send verification code', })
+    async sendCode(@Body('phoneNumber') phoneNumber: string): Promise<string> {
+        console.log(phoneNumber)
+        const code = '123456'; // Aquí deberías generar un código aleatorio o de alguna manera
+        await this.authService.sendVerificationCode(phoneNumber, code);
+        return 'Código de verificación enviado.';
     }
 
 
