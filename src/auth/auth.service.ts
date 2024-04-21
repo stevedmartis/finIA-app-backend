@@ -10,9 +10,6 @@ import { v4 } from 'uuid';
 import { Request } from 'express';
 import { getClientIp } from 'request-ip';
 import Cryptr from 'cryptr';
-import { AccountFloidWidgetDto } from 'src/user/dto/floid-widget.dto';
-import { validate, ValidationError } from 'class-validator';
-import { AccountFloidWidget } from 'src/user/interfaces/floid-widget';
 import Twilio from 'twilio';
 
 @Injectable()
@@ -22,7 +19,6 @@ export class AuthService {
   twilioClient: any;
 
   constructor(
-    @InjectModel('FloidAccountWidget') private readonly floidWidgetModel: Model<any>,
     @InjectModel('RefreshToken') private readonly refreshTokenModel: Model<RefreshToken>,
     @InjectModel('User') private readonly userModel: Model<User>,
     private readonly jwtService: JwtService,
@@ -91,42 +87,7 @@ export class AuthService {
     return token;
   }
 
-  async createAccountFloidWidget(createFloidAccount: AccountFloidWidgetDto): Promise<AccountFloidWidget> {
-    try {
-      const errors = await this.validateDto(createFloidAccount);
-      if (errors.length > 0) {
-        const errorMessage = this.formatValidationError(errors);
-        throw new Error(`Los datos proporcionados no son válidos: ${errorMessage}`);
-      }
-      console.log('createFloidAccount', createFloidAccount);
-      // Respuesta exitosa, save account
-      const account = new this.floidWidgetModel(createFloidAccount);
 
-      console.log(account);
-      await this.isConsumerIsUnique(account.consumerId);
-      const resp = await account.save();
-      console.log(resp);
-      const jsonString = JSON.stringify(createFloidAccount, null, 2);
-      console.log('Cuenta desde floid creada con exito:', jsonString);
-      // Lógica de autenticación aquí
-      return resp;
-      console.log('Autenticación Floid exitosa:', jsonString);
-    } catch (error) {
-      // Manejo de errores
-      console.error('Error en la autenticación Floid:', error);
-      throw error;
-    }
-  }
-
-  private async validateDto(dto: any): Promise<ValidationError[]> {
-    // Utiliza la función validate de class-validator para validar el DTO
-    return await validate(dto);
-  }
-
-  private formatValidationError(errors: ValidationError[]): string {
-    // Formatea los mensajes de error para que sean más legibles
-    return errors.map(error => Object.values(error.constraints).join(', ')).join('; ');
-  }
 
   async sendVerificationCode(phoneNumber: string, code: string): Promise<void> {
     console.log(phoneNumber)
@@ -164,20 +125,6 @@ export class AuthService {
     return this.cryptr.encrypt(text);
   }
 
-
-  // ********************************************
-  // ╔═╗╦═╗╦╦  ╦╔═╗╔╦╗╔═╗  ╔╦╗╔═╗╔╦╗╦ ╦╔═╗╔╦╗╔═╗
-  // ╠═╝╠╦╝║╚╗╔╝╠═╣ ║ ║╣   ║║║║╣  ║ ╠═╣║ ║ ║║╚═╗
-  // ╩  ╩╚═╩ ╚╝ ╩ ╩ ╩ ╚═╝  ╩ ╩╚═╝ ╩ ╩ ╩╚═╝═╩╝╚═╝
-  // ********************************************
-
-  private async isConsumerIsUnique(consumerId: string) {
-    const account = await this.floidWidgetModel.findOne({ consumerId: consumerId });
-    console.log('account find?', account)
-    if (account) {
-      throw new BadRequestException('Account most be unique.');
-    }
-  }
 
 
 

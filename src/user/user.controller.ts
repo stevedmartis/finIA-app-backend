@@ -35,8 +35,8 @@ export class UserController {
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Register user' })
     @ApiCreatedResponse({})
-    async register(@Body() createUserDto: CreateUserDto) {
-        return await this.userService.create(createUserDto);
+    async register(@Req() req: Request, @Body() createUserDto: CreateUserDto) {
+        return await this.userService.create(req, createUserDto);
     }
 
     @Post('verify-email')

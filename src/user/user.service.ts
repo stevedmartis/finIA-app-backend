@@ -31,13 +31,33 @@ export class UserService {
     // ┌─┐┬─┐┌─┐┌─┐┌┬┐┌─┐  ┬ ┬┌─┐┌─┐┬─┐
     // │  ├┬┘├┤ ├─┤ │ ├┤   │ │└─┐├┤ ├┬┘
     // └─┘┴└─└─┘┴ ┴ ┴ └─┘  └─┘└─┘└─┘┴└─
-    async create(createUserDto: CreateUserDto): Promise<User> {
-        const user = new this.userModel(createUserDto);
-        await this.isEmailUnique(user.email);
-        console.log('user', user)
-        this.setRegistrationInfo(user);
-        const resp = await user.save();
-        return this.buildRegistrationInfo(user);
+    async create(req: Request, createUserDto: CreateUserDto): Promise<any> {
+        console.log(createUserDto);
+        const existingUser = await this.userModel.findOne({ email: createUserDto.email, verified: false });
+        console.log('existingUser', existingUser)
+        if (existingUser) {
+            console.log('User already exists, attempting to log in...');
+            return this.loginExistingUser(req, existingUser);
+        }
+
+        console.log('Creating new user...');
+        const newUser = new this.userModel(createUserDto);
+        this.setRegistrationInfo(newUser);
+        await newUser.save();
+        console.log('Creaado con exito');
+        return this.buildRegistrationInfo(newUser);
+    }
+
+    private async loginExistingUser(req: Request, user: User): Promise<any> {
+        console.log('Logging in user:', user.email);
+        const accessToken = await this.authService.createAccessToken(user._id);
+        const refreshToken = await this.authService.createRefreshToken(req, user._id);
+        return {
+            fullName: user.fullName,
+            email: user.email,
+            accessToken: accessToken,
+            refreshToken: refreshToken
+        };
     }
 
     // ┬  ┬┌─┐┬─┐┬┌─┐┬ ┬  ┌─┐┌┬┐┌─┐┬┬

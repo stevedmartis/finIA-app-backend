@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 import { warn } from 'console';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-
+const cors = require('cors');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -16,6 +16,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
     // disableErrorMessages: true,
   }));
+  app.use(cors());
 
   // ╔═╗╦ ╦╔═╗╔═╗╔═╗╔═╗╦═╗
   // ╚═╗║║║╠═╣║ ╦║ ╦║╣ ╠╦╝

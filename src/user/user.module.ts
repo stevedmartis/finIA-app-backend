@@ -5,8 +5,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { ForgotPasswordSchema } from './schemas/forgot-password.schema';
-import { AuthController } from './authentication.controller';
-import { FloidAccountWidgetSchema, IncomeAccountSchema, SourceSchema } from './schemas/floid-widget.schema';
+import { AuthController } from '../auth/authentication.controller';
 
 @Module({
   imports: [
