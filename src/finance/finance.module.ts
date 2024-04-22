@@ -1,15 +1,21 @@
 // src/finance/finance.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import Accounts from 'twilio/lib/rest/Accounts';
 import { FinanceController } from './finance.controller';
 import { FinanceService } from './finance.service';
-import { FloidAccountWidgetSchema } from './schemas/floid-widget.schema';
+import { AccountModel, FloidAccountWidgetModel, TransactionModel } from './models/floid-account-summary';
 
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { name: 'FloidAccountWidget', schema: FloidAccountWidgetSchema }
+            { name: 'FloidAccountWidget', schema: FloidAccountWidgetModel.schema },
+            { name: 'Account', schema: AccountModel.schema },
+            { name: 'Transaction', schema: TransactionModel.schema },
+
         ])
+
+
     ],
     controllers: [FinanceController],
     providers: [FinanceService],

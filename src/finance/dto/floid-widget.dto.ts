@@ -1,6 +1,7 @@
 export interface FloidAccountWidgetDto {
     consumerId: string;
     caseid: string;
+    userId: string;
     products: {
         accounts: IAccountDto[];
         cards: any[];
