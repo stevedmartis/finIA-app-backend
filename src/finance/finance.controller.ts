@@ -20,6 +20,7 @@ export class FinanceController {
     @ApiCreatedResponse({})
     @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
     async createAccount(@Body() createFloidAccountDto: FloidAccountWidgetDto): Promise<IFloidAccountWidget> {
+        console.log('createFloidAccountDto', createFloidAccountDto)
         return this.financeService.createAccountFloidWidget(createFloidAccountDto);
     }
 
