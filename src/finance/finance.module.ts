@@ -5,9 +5,11 @@ import Accounts from 'twilio/lib/rest/Accounts';
 import { FinanceController } from './finance.controller';
 import { FinanceService } from './finance.service';
 import { AccountModel, FloidAccountWidgetModel, TransactionModel } from './models/floid-account-summary';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
     imports: [
+        HttpModule,
         MongooseModule.forFeature([
             { name: 'FloidAccountWidget', schema: FloidAccountWidgetModel.schema },
             { name: 'Account', schema: AccountModel.schema },

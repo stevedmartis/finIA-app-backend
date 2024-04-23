@@ -1,8 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { map } from 'rxjs';
+import { UserCredentialDto } from './dto/floid-credential.dto';
 import { FloidAccountWidgetDto } from './dto/floid-widget.dto';
 import { IFloidAccountWidget, IAccount, ITransaction } from './models/floid-account-summary';
+import { AxiosResponse } from 'axios';
+import { Observable } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 const categoriesMap = {
     'Alimentos': ['supermercado', 'restaurante', 'café'],
@@ -17,6 +22,7 @@ const categoriesMap = {
 @Injectable()
 export class FinanceService {
     constructor(
+        private httpService: HttpService,
         @InjectModel('FloidAccountWidget') private readonly floidWidgetModel: Model<IFloidAccountWidget>,
         @InjectModel('Account') private readonly accountModel: Model<IAccount>,
         @InjectModel('Transaction') private readonly transactionModel: Model<ITransaction>
@@ -24,6 +30,7 @@ export class FinanceService {
 
     async createAccountFloidWidget(createFloidAccount: FloidAccountWidgetDto): Promise<IFloidAccountWidget> {
         try {
+
             if (!createFloidAccount.consumerId) {
                 throw new BadRequestException('Validation failed: consumerId is required');
             }
@@ -49,6 +56,24 @@ export class FinanceService {
             throw error instanceof BadRequestException ? error : new BadRequestException(error.message);
         }
     }
+
+    getProductsForAccount(userId: string, account: string, tokenPassword: string): Observable<AxiosResponse> {
+        const url = 'https://api.floid.ai/products'; // Asumiendo que este es el endpoint correcto
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tokenPassword}`,
+        };
+
+        const body = {
+            userId,
+            account,
+        };
+
+        return this.httpService.post(url, body, { headers }).pipe(
+            map(response => response.data)
+        );
+    }
+
     async getFinancialSummaryForUser(userId: string): Promise<any> {
         try {
             console.log(`Buscando resumen financiero para el usuario con ID: ${userId}`);
