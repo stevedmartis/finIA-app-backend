@@ -37,7 +37,7 @@ export class UserService {
         console.log('existingUser', existingUser)
         if (existingUser) {
             console.log('User already exists, attempting to log in...');
-            return this.loginExistingUser(req, existingUser);
+            return this.loginExistingOrCreateUser(req, existingUser);
         }
 
         console.log('Creating new user...');
@@ -45,14 +45,15 @@ export class UserService {
         this.setRegistrationInfo(newUser);
         await newUser.save();
         console.log('Creaado con exito');
-        return this.buildRegistrationInfo(newUser);
+        return this.loginExistingOrCreateUser(req, newUser);
     }
 
-    private async loginExistingUser(req: Request, user: User): Promise<any> {
+    private async loginExistingOrCreateUser(req: Request, user: User): Promise<any> {
         console.log('Logging in user:', user.email);
         const accessToken = await this.authService.createAccessToken(user._id);
         const refreshToken = await this.authService.createRefreshToken(req, user._id);
         return {
+            userId: user._id,
             fullName: user.fullName,
             email: user.email,
             accessToken: accessToken,
@@ -167,14 +168,6 @@ export class UserService {
         user.verificationExpires = addHours(new Date(), this.HOURS_TO_VERIFY);
     }
 
-    private buildRegistrationInfo(user): any {
-        const userRegistrationInfo = {
-            fullName: user.fullName,
-            email: user.email,
-            verified: user.verified,
-        };
-        return userRegistrationInfo;
-    }
 
     private async findByVerification(verification: string): Promise<User> {
         const user = await this.userModel.findOne({ verification, verified: false, verificationExpires: { $gt: new Date() } });

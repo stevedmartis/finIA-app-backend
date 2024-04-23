@@ -10,6 +10,7 @@ const categoriesMap = {
     'Hogar': ['alquiler', 'hipoteca', 'muebles'],
     'Salud': ['doctor', 'clínica', 'hospital', 'farmacia'],
     'Deuda': ['credito'],
+    'Seguros': ['desgravamen'],
     'No Categorizado': []
 };
 
@@ -56,7 +57,7 @@ export class FinanceService {
             const accountsInfo = await this.floidWidgetModel.findOne({ userId: userId }).exec();
             if (!accountsInfo) {
                 console.log('No se encontró información para el usuario.');
-                return { userId, financialSummary: [] };
+                return { userId: userId, creditcards: [], financialSummary: [] };
             }
 
             console.log(`Información encontrada para el usuario: ${accountsInfo}`);
@@ -65,14 +66,16 @@ export class FinanceService {
             const financialSummary = await this.processAccounts(accountsInfo);
             console.log('Resúmenes financieros generados para todas las cuentas.');
 
-            return { userId, financialSummary };
+            // Procesar la información de las tarjetas
+            const creditcards = await this.processCards(accountsInfo);
+            console.log('Resúmenes financieros generados para todas las cuentas.');
+
+            return { userId, creditcards, financialSummary };
         } catch (error) {
             console.error(`Error al recuperar el resumen financiero para el usuario ${userId}:`, error);
             throw new Error('Failed to retrieve financial summary');
         }
     }
-
-
 
     private async processAccounts(accountsInfo: IFloidAccountWidget): Promise<any[]> {
         const financialSummary: any[] = [];
@@ -93,6 +96,26 @@ export class FinanceService {
         });
 
         return financialSummary;
+    }
+
+    private async processCards(accountsInfo: IFloidAccountWidget): Promise<any[]> {
+        const cardsAccount: any[] = [];
+
+        // Recorrer las cuentas
+        accountsInfo.products.cards.forEach(card => {
+            console.log(card)
+            const cardInfo: any = {
+                name: card.name,
+                number: card.number,
+                currency: card.currency,
+                total: card.total,
+                used: card.used,
+                available: card.available,
+            };
+            cardsAccount.push(cardInfo);
+        });
+
+        return cardsAccount;
     }
 
     private calculateTotalIncome(transactions: ITransaction[]): number {
