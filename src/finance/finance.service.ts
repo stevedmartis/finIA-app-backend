@@ -58,15 +58,16 @@ export class FinanceService {
     }
 
     getProductsForAccount(userId: string, account: string, tokenPassword: string): Observable<AxiosResponse> {
-        const url = 'https://api.floid.ai/products'; // Asumiendo que este es el endpoint correcto
+        console.log(userId, account, tokenPassword)
+        const url = 'https://readme.floid.ai/reference/santander-personas-products'; // Asumiendo que este es el endpoint correcto
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${tokenPassword}`,
+            'Authorization': `Bearer ${process.env.JWT_SECRET}`,
         };
 
         const body = {
-            userId,
-            account,
+            'id': userId,
+            'password': tokenPassword,
         };
 
         return this.httpService.post(url, body, { headers }).pipe(
