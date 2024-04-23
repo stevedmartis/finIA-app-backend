@@ -62,7 +62,7 @@ export class FinanceService {
         const url = 'https://readme.floid.ai/reference/santander-personas-products'; // Asumiendo que este es el endpoint correcto
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.JWT_SECRET}`,
+            'Authorization': `Bearer ${process.env.FLOID_TOKEN}`,
         };
 
         const body = {
