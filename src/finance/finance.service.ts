@@ -63,14 +63,12 @@ export class FinanceService {
         tokenPassword: string,
         bank: string
     ): Observable<AxiosResponse> {
-        const url = `https://sandbox.floid.app/cl/banco_${bank}_personas/transactions`;
+        const url = 'https://sandbox.floid.app/cl/widget/get'; // URL corregida según docs
 
-        // Log de la petición
-        console.log('Enviando petición a Floid:', {
+        console.log('Enviando petición a Floid Widget:', {
             url,
-            body: { token_password: tokenPassword },
-            userId,
-            account
+            tokenPassword,
+            bank
         });
 
         const headers = {
@@ -78,31 +76,26 @@ export class FinanceService {
             'Authorization': `Bearer ${process.env.FLOID_TOKEN}`,
         };
 
-        // Log del token (solo para desarrollo)
-        console.log('Headers:', {
-            ...headers,
-            'Authorization': headers.Authorization ? 'Bearer [EXISTS]' : 'Bearer [MISSING]'
-        });
-
+        // Body según la documentación de Floid
         const body = {
-            token_password: tokenPassword
+            token_password: tokenPassword,
+            type: "banks", // products + transactions + income
+            callbackUrl: `${process.env.API_URL}/finance/callbackurl`
         };
 
         return this.httpService.post(url, body, { headers }).pipe(
             tap(response => {
-                console.log('Respuesta exitosa de Floid:', {
+                console.log('Respuesta del Widget:', {
                     status: response.status,
                     data: response.data
                 });
             }),
             map(response => response.data),
             catchError(error => {
-                console.error('Error detallado en Floid API:', {
+                console.error('Error en Widget API:', {
                     status: error.response?.status,
                     data: error.response?.data,
-                    message: error.message,
-                    url: url,
-                    body: body
+                    message: error.message
                 });
 
                 throw new HttpException(
