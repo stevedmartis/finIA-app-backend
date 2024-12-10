@@ -63,43 +63,49 @@ export class FinanceService {
         tokenPassword: string,
         bank: string
     ): Observable<AxiosResponse> {
-        const url = 'https://sandbox.floid.app/cl/widget/get'; // URL corregida según docs
+        const url = 'https://sandbox.floid.app/cl/widget/get';
 
-        console.log('Enviando petición a Floid Widget:', {
-            url,
-            tokenPassword,
-            bank
-        });
+        // Asegurarnos que el token existe
+        if (!process.env.FLOID_TOKEN) {
+            throw new HttpException('FLOID_TOKEN not configured', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.FLOID_TOKEN}`,
+            'Authorization': `Bearer ${process.env.FLOID_TOKEN}`.trim(), // Asegurarnos que no hay espacios extra
         };
 
-        // Body según la documentación de Floid
         const body = {
             token_password: tokenPassword,
-            type: "banks", // products + transactions + income
+            type: "banks",
+            environment: "sandbox", // Añadido el ambiente de sandbox
             callbackUrl: `${process.env.API_URL}/finance/callbackurl`
         };
 
+        console.log('Enviando petición a Floid Widget:', {
+            url,
+            headers: {
+                ...headers,
+                'Authorization': 'Bearer [HIDDEN]' // No mostramos el token completo en logs
+            },
+            body
+        });
+
         return this.httpService.post(url, body, { headers }).pipe(
             tap(response => {
-                console.log('Respuesta del Widget:', {
-                    status: response.status,
-                    data: response.data
-                });
+                console.log('Respuesta exitosa del Widget');
             }),
             map(response => response.data),
             catchError(error => {
                 console.error('Error en Widget API:', {
                     status: error.response?.status,
                     data: error.response?.data,
-                    message: error.message
+                    message: error.message,
+                    headers: error.response?.headers
                 });
 
                 throw new HttpException(
-                    error.response?.data?.message || 'Error processing request',
+                    `Error: ${error.response?.data?.display_message || error.message}`,
                     error.response?.status || HttpStatus.BAD_REQUEST
                 );
             })
