@@ -111,6 +111,34 @@ export class FinanceController {
         }
     }
 
+
+    @Post('receive-data')
+    async receiveFloidData(@Body() data: any) {
+        console.log('Datos recibidos de Floid:', data);
+
+        try {
+            if (data.widget) {
+                // Procesar datos del widget
+                await this.financeService.processWidgetData(data.widget);
+            }
+
+            if (data.transactions) {
+                // Procesar datos de transacciones
+                await this.financeService.processTransactionData(data.transactions);
+            }
+
+            // Aquí podrías notificar al cliente a través de WebSockets si es necesario
+            // this.financeGateway.sendDataUpdate(data.caseId, { widget: data.widget, transactions: data.transactions });
+
+            return { success: true, message: 'Datos procesados correctamente' };
+        } catch (error) {
+            console.error('Error procesando datos de Floid:', error);
+            throw new HttpException('Error procesando datos de Floid', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
     private processTransactionData(data: any): any[] {
         // Lógica para procesar los datos de transacciones recibidos
         return data.transactions;

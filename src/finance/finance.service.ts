@@ -63,8 +63,7 @@ export class FinanceService {
         tokenPassword: string,
         bank: string
     ) {
-        const widgetCallbackUrl = `${process.env.API_URL}/finance/widget-callback`;
-        const transactionsCallbackUrl = `${process.env.API_URL}/finance/transactions-callback`;
+        const callbackUrl = `${process.env.API_URL}/finance/receive-data`;
 
         try {
             // Realizar la petición inicial al widget de Floid
@@ -74,7 +73,7 @@ export class FinanceService {
                     token_password: tokenPassword,
                     type: 'banks',
                     environment: 'sandbox',
-                    callbackUrl: widgetCallbackUrl
+                    callbackUrl: callbackUrl
                 },
                 {
                     headers: {
@@ -94,7 +93,7 @@ export class FinanceService {
                     token_password: tokenPassword,
                     id: userId,
                     account: account,
-                    callbackUrl: transactionsCallbackUrl
+                    callbackUrl: callbackUrl
                 },
                 {
                     headers: {
@@ -107,6 +106,7 @@ export class FinanceService {
             // Devolver una respuesta inicial
             return {
                 caseId: caseId,
+                widgetResponse: widgetResponse.data,
                 transactionsResponse: transactionsResponse.data
             };
         } catch (error) {
@@ -167,6 +167,13 @@ export class FinanceService {
             })
         );
     }
+
+    async processWidgetData(widgetData: any) {
+        // Implementa la lógica para procesar los datos del widget
+        console.log('Procesando datos del widget:', widgetData);
+        // Por ejemplo, podrías guardar estos datos en tu base de datos
+    }
+
 
     public processTransactionData(data: any): any[] {
         // Extraer la información relevante de las transacciones
