@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { catchError, map } from 'rxjs';
+import { catchError, map, tap } from 'rxjs';
 import { UserCredentialDto } from './dto/floid-credential.dto';
 import { FloidAccountWidgetDto } from './dto/floid-widget.dto';
 import { IFloidAccountWidget, IAccount, ITransaction } from './models/floid-account-summary';
@@ -63,23 +63,48 @@ export class FinanceService {
         tokenPassword: string,
         bank: string
     ): Observable<AxiosResponse> {
-        console.log(userId, account, tokenPassword, bank);
-
         const url = `https://sandbox.floid.app/cl/banco_${bank}_personas/transactions`;
+
+        // Log de la petición
+        console.log('Enviando petición a Floid:', {
+            url,
+            body: { token_password: tokenPassword },
+            userId,
+            account
+        });
 
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${process.env.FLOID_TOKEN}`,
         };
 
+        // Log del token (solo para desarrollo)
+        console.log('Headers:', {
+            ...headers,
+            'Authorization': headers.Authorization ? 'Bearer [EXISTS]' : 'Bearer [MISSING]'
+        });
+
         const body = {
             token_password: tokenPassword
         };
 
         return this.httpService.post(url, body, { headers }).pipe(
+            tap(response => {
+                console.log('Respuesta exitosa de Floid:', {
+                    status: response.status,
+                    data: response.data
+                });
+            }),
             map(response => response.data),
             catchError(error => {
-                console.error('Error in Floid API:', error.response?.data || error.message);
+                console.error('Error detallado en Floid API:', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message,
+                    url: url,
+                    body: body
+                });
+
                 throw new HttpException(
                     error.response?.data?.message || 'Error processing request',
                     error.response?.status || HttpStatus.BAD_REQUEST

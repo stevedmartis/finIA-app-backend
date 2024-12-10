@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "deploy": "pm2 stop all && git pull && npm install && pm2 restart all",
+    "deploy": "pm2 stop all && git pull && npm install && pm2 restart all && pm2 logs",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "nodemon",
