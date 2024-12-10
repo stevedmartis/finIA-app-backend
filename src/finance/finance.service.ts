@@ -112,6 +112,46 @@ export class FinanceService {
         );
     }
 
+
+    getTransacctionsForAccount(
+        userId: string,
+        account: string,
+        tokenPassword: string,
+        bank: string
+    ): Observable<AxiosResponse> {
+        // Volver al endpoint de transacciones que funcionaba
+        const url = `https://sandbox.floid.app/cl/banco_${bank}_personas/transactions`;
+
+        console.log('Enviando petición a Floid:', {
+            url,
+            hasToken: !!process.env.FLOID_TOKEN
+        });
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.FLOID_TOKEN}`,
+        };
+
+        // Body simplificado solo con token_password
+        const body = {
+            token_password: tokenPassword
+        };
+
+        return this.httpService.post(url, body, { headers }).pipe(
+            tap(response => {
+                console.log('Respuesta de Floid:', response.data);
+            }),
+            map(response => response.data),
+            catchError(error => {
+                console.error('Error en API Floid:', error.response?.data || error.message);
+                throw new HttpException(
+                    error.response?.data?.display_message || 'Error processing request',
+                    error.response?.status || HttpStatus.BAD_REQUEST
+                );
+            })
+        );
+    }
+
     async getFinancialSummaryForUser(userId: string): Promise<any> {
         try {
             console.log(`Buscando resumen financiero para el usuario con ID: ${userId}`);
