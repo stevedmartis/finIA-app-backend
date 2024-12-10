@@ -136,14 +136,13 @@ export class FinanceService {
             'Authorization': `Bearer ${process.env.FLOID_TOKEN}`,
         };
 
-        // Agregamos más parámetros según la documentación
+        const transactionsCallbackUrl = `${process.env.API_URL}/finance/transactions-callback`;
         const body = {
             token_password: tokenPassword,
-            id: userId,           // Añadido ID del usuario
-            account: account,     // Añadido número de cuenta
-            callbackUrl: `${process.env.API_URL}/finance/callbackurl`
+            id: userId,
+            account: account,
+            callbackUrl: transactionsCallbackUrl
         };
-
         console.log('Body de la petición:', JSON.stringify(body, null, 2));
 
         return this.httpService.post(url, body, { headers }).pipe(
