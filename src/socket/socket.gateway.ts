@@ -15,7 +15,7 @@ export class FinanceGateway implements OnGatewayConnection, OnGatewayDisconnect 
     console.log(`Cliente desconectado: ${client.id}`);
   }
 
-  sendTransactionsUpdate(transactions: any[]) {
+  sendTransactionsUpdate(caseId: string, transactions: any[]) {
     this.server.emit('transactions-update', transactions);
   }
 }

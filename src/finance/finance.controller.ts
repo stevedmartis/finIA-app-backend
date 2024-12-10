@@ -91,14 +91,15 @@ export class FinanceController {
 
     @Post('transactions-callback')
     async handleTransactionsCallback(@Body() data: any) {
-        console.log('Transacciones recibidas desde Floid:', data);
+        console.log('Transactions Callback received:', data);
+        const { caseid, transactions } = data;
 
         try {
             // Procesar los datos de transacciones recibidos
-            const transactions = this.processTransactionData(data);
+            const processedTransactions = this.financeService.processTransactionData(transactions);
 
             // Notificar al front-end a través de WebSockets
-            this.financeGateway.sendTransactionsUpdate(transactions);
+            this.financeGateway.sendTransactionsUpdate(caseid, processedTransactions);
 
             return { success: true, message: 'Callback procesado correctamente' };
         } catch (error) {

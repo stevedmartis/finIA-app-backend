@@ -168,6 +168,49 @@ export class FinanceService {
         );
     }
 
+    public processTransactionData(data: any): any[] {
+        // Extraer la información relevante de las transacciones
+        const transactions = data.transactions.map(transaction => ({
+            id: transaction.id,
+            date: transaction.date,
+            description: transaction.description,
+            amount: transaction.amount,
+            currency: transaction.currency
+        }));
+
+        // Realizar cualquier otra transformación o análisis necesario
+        const processedTransactions = this.analyzeTransactions(transactions);
+
+        return processedTransactions;
+    }
+
+    private analyzeTransactions(transactions: any[]): any[] {
+        // Define the type for the transactionTotals object
+        interface TransactionTotals {
+            [currency: string]: {
+                total: number;
+                count: number;
+            };
+        }
+
+        // Perform the analysis on the transactions
+        const transactionTotals: TransactionTotals = transactions.reduce((totals, transaction) => {
+            if (!totals[transaction.currency]) {
+                totals[transaction.currency] = { total: 0, count: 0 };
+            }
+            totals[transaction.currency].total += transaction.amount;
+            totals[transaction.currency].count++;
+            return totals;
+        }, {});
+
+        // Transform the totals object into an array
+        return Object.entries(transactionTotals).map(([currency, total]) => ({
+            currency,
+            total: total.total,
+            count: total.count
+        }));
+    }
+
     async getFinancialSummaryForUser(userId: string): Promise<any> {
         try {
             console.log(`Buscando resumen financiero para el usuario con ID: ${userId}`);
