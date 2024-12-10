@@ -10,8 +10,12 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-  },
-  "exclude": [
-    "node_modules"
-  ]
-}
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "exclude": [
+      "node_modules"
+    ]
+  }
