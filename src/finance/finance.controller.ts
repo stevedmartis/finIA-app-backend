@@ -41,13 +41,34 @@ export class FinanceController {
     @ApiOperation({ summary: 'Auth Floid user' })
     @ApiCreatedResponse({})
     processUserAccounts(@Body() userAccountsDto: UserCredentialDto): Observable<any[]> {
-
         console.log('userAccountsDto', userAccountsDto);
+
+        const bankMap = {
+            'Santander': 'santander',
+            'Banco de Chile': 'chile',
+            'Itaú': 'itau',
+            'BCI': 'bci',
+            'Banco Estado': 'estado',
+            'BICE': 'bice',
+            'Banco Falabella': 'falabella',
+            'Banco Ripley': 'ripley',
+            'Scotiabank': 'scotiabank',
+            'Security': 'security'
+        };
+
+        const normalizedBank = bankMap[userAccountsDto.bank] || userAccountsDto.bank.toLowerCase();
+
         const requests = userAccountsDto.accounts.map(account =>
-            this.financeService.getProductsForAccount(userAccountsDto.id, account.account, account.token_password)
+            this.financeService.getProductsForAccount(
+                userAccountsDto.id,
+                account.account,
+                account.token_password,
+                normalizedBank
+            )
         );
-        console.log('requests', requests)
-        return forkJoin(requests); // Ejecuta todas las solicitudes HTTP de manera concurrente y recoge los resultados
+
+        console.log('requests', requests);
+        return forkJoin(requests);
     }
 
 }

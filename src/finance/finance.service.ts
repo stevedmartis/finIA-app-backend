@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { map } from 'rxjs';
+import { catchError, map } from 'rxjs';
 import { UserCredentialDto } from './dto/floid-credential.dto';
 import { FloidAccountWidgetDto } from './dto/floid-widget.dto';
 import { IFloidAccountWidget, IAccount, ITransaction } from './models/floid-account-summary';
@@ -57,21 +57,34 @@ export class FinanceService {
         }
     }
 
-    getProductsForAccount(userId: string, account: string, tokenPassword: string): Observable<AxiosResponse> {
-        console.log(userId, account, tokenPassword)
-        const url = 'https://readme.floid.ai/reference/santander-personas-products'; // Asumiendo que este es el endpoint correcto
+    getProductsForAccount(
+        userId: string,
+        account: string,
+        tokenPassword: string,
+        bank: string
+    ): Observable<AxiosResponse> {
+        console.log(userId, account, tokenPassword, bank);
+
+        const url = `https://sandbox.floid.app/cl/banco_${bank}_personas/transactions`;
+
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${process.env.FLOID_TOKEN}`,
         };
 
         const body = {
-            'id': userId,
-            'password': tokenPassword,
+            token_password: tokenPassword
         };
 
         return this.httpService.post(url, body, { headers }).pipe(
-            map(response => response.data)
+            map(response => response.data),
+            catchError(error => {
+                console.error('Error in Floid API:', error.response?.data || error.message);
+                throw new HttpException(
+                    error.response?.data?.message || 'Error processing request',
+                    error.response?.status || HttpStatus.BAD_REQUEST
+                );
+            })
         );
     }
 
