@@ -78,7 +78,7 @@ export class FinanceController {
                 );
             }
 
-            return this.financeService.getTransacctionsForAccount(
+            return this.financeService.getProductsForAccount(
                 userAccountsDto.id,
                 account.account,
                 account.token_password,
