@@ -148,6 +148,7 @@ export class FinanceService {
         return this.httpService.post(url, body, { headers }).pipe(
             tap(response => {
                 console.log('Respuesta completa de Floid:', {
+                    response: response,
                     status: response.status,
                     statusText: response.statusText,
                     data: response.data
