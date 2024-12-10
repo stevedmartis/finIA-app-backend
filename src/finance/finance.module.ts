@@ -6,6 +6,7 @@ import { FinanceController } from './finance.controller';
 import { FinanceService } from './finance.service';
 import { AccountModel, FloidAccountWidgetModel, TransactionModel } from './models/floid-account-summary';
 import { HttpModule } from '@nestjs/axios';
+import { FinanceGateway } from 'src/socket/socket.gateway';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { HttpModule } from '@nestjs/axios';
 
     ],
     controllers: [FinanceController],
-    providers: [FinanceService],
+    providers: [FinanceService, FinanceGateway],
+    exports: [FinanceGateway]
 })
 export class FinanceModule { }
