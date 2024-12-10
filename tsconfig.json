@@ -11,6 +11,9 @@
     "outDir": "./dist",
     "baseUrl": "./",
   },
+  "ts-node": {
+    "esm": true
+  },
   "exclude": [
     "node_modules"
   ]
