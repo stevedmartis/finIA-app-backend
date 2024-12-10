@@ -35,12 +35,13 @@ export class FinanceController {
             throw new HttpException('Failed to retrieve financial summary', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @Post('callbackurl')
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Auth Floid user' })
-    @ApiCreatedResponse({})
     processUserAccounts(@Body() userAccountsDto: UserCredentialDto): Observable<any[]> {
-        console.log('Datos recibidos:', JSON.stringify(userAccountsDto, null, 2));
+        if (!userAccountsDto.accounts || userAccountsDto.accounts.length === 0) {
+            throw new HttpException('No accounts provided', HttpStatus.BAD_REQUEST);
+        }
 
         const bankMap = {
             'Santander': 'santander',
@@ -55,24 +56,28 @@ export class FinanceController {
             'Security': 'security'
         };
 
-        const normalizedBank = bankMap[userAccountsDto.bank] || userAccountsDto.bank.toLowerCase();
+        const normalizedBank = bankMap[userAccountsDto.bank]?.toLowerCase() ||
+            userAccountsDto.bank.toLowerCase();
+
+        console.log('Procesando petición:', {
+            bank: normalizedBank,
+            accountsCount: userAccountsDto.accounts.length,
+            hasToken: !!process.env.FLOID_TOKEN
+        });
 
         const requests = userAccountsDto.accounts.map(account => {
-            console.log('Procesando cuenta:', {
-                userId: userAccountsDto.id,
-                account: account.account,
-                bank: normalizedBank
-            });
+            if (!account.token_password) {
+                throw new HttpException(
+                    `Missing token_password for account ${account.account}`,
+                    HttpStatus.BAD_REQUEST
+                );
+            }
 
             return this.financeService.getProductsForAccount(
                 userAccountsDto.id,
                 account.account,
                 account.token_password,
                 normalizedBank
-            ).pipe(
-                tap(response => {
-                    console.log('Respuesta para cuenta:', account.account, JSON.stringify(response, null, 2));
-                })
             );
         });
 
