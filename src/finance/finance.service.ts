@@ -57,59 +57,62 @@ export class FinanceService {
         }
     }
 
-    getProductsForAccount(
+    async getProductsForAccount(
         userId: string,
         account: string,
         tokenPassword: string,
         bank: string
-    ): Observable<AxiosResponse> {
-        const url = 'https://sandbox.floid.app/cl/widget/get';
+    ) {
+        const widgetCallbackUrl = `${process.env.API_URL}/finance/widget-callback`;
+        const transactionsCallbackUrl = `${process.env.API_URL}/finance/transactions-callback`;
 
-        // Asegurarnos que el token existe
-        if (!process.env.FLOID_TOKEN) {
-            throw new HttpException('FLOID_TOKEN not configured', HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            // Realizar la petición inicial al widget de Floid
+            const widgetResponse = await this.httpService.post(
+                'https://sandbox.floid.app/cl/widget/get',
+                {
+                    token_password: tokenPassword,
+                    type: 'banks',
+                    environment: 'sandbox',
+                    callbackUrl: widgetCallbackUrl
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${process.env.FLOID_TOKEN}`
+                    }
+                }
+            ).toPromise();
+
+            // Obtener el case ID de la respuesta del widget
+            const caseId = widgetResponse.data.caseid;
+
+            // Realizar la petición para obtener los datos de transacciones
+            const transactionsResponse = await this.httpService.post(
+                `https://sandbox.floid.app/cl/banco_${bank}_personas/transactions`,
+                {
+                    token_password: tokenPassword,
+                    id: userId,
+                    account: account,
+                    callbackUrl: transactionsCallbackUrl
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${process.env.FLOID_TOKEN}`
+                    }
+                }
+            ).toPromise();
+
+            // Devolver una respuesta inicial
+            return {
+                caseId: caseId,
+                transactionsResponse: transactionsResponse.data
+            };
+        } catch (error) {
+            console.error('Error al obtener los productos:', error);
+            throw error;
         }
-
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.FLOID_TOKEN}`.trim(), // Asegurarnos que no hay espacios extra
-        };
-
-        const body = {
-            token_password: tokenPassword,
-            type: "banks",
-            environment: "sandbox", // Añadido el ambiente de sandbox
-            callbackUrl: `${process.env.API_URL}/finance/callbackurl`
-        };
-
-        console.log('Enviando petición a Floid Widget:', {
-            url,
-            headers: {
-                ...headers,
-                'Authorization': 'Bearer [HIDDEN]' // No mostramos el token completo en logs
-            },
-            body
-        });
-
-        return this.httpService.post(url, body, { headers }).pipe(
-            tap(response => {
-                console.log('Respuesta exitosa del Widget');
-            }),
-            map(response => response.data),
-            catchError(error => {
-                console.error('Error en Widget API:', {
-                    status: error.response?.status,
-                    data: error.response?.data,
-                    message: error.message,
-                    headers: error.response?.headers
-                });
-
-                throw new HttpException(
-                    `Error: ${error.response?.data?.display_message || error.message}`,
-                    error.response?.status || HttpStatus.BAD_REQUEST
-                );
-            })
-        );
     }
 
 
