@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, tap } from 'rxjs';
 import { UserCredentialDto } from './dto/floid-credential.dto';
 import { FloidAccountWidgetDto } from './dto/floid-widget.dto';
 
@@ -35,13 +35,12 @@ export class FinanceController {
             throw new HttpException('Failed to retrieve financial summary', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     @Post('callbackurl')
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Auth Floid user' })
     @ApiCreatedResponse({})
     processUserAccounts(@Body() userAccountsDto: UserCredentialDto): Observable<any[]> {
-        console.log('userAccountsDto', userAccountsDto);
+        console.log('Datos recibidos:', JSON.stringify(userAccountsDto, null, 2));
 
         const bankMap = {
             'Santander': 'santander',
@@ -58,17 +57,27 @@ export class FinanceController {
 
         const normalizedBank = bankMap[userAccountsDto.bank] || userAccountsDto.bank.toLowerCase();
 
-        const requests = userAccountsDto.accounts.map(account =>
-            this.financeService.getProductsForAccount(
+        const requests = userAccountsDto.accounts.map(account => {
+            console.log('Procesando cuenta:', {
+                userId: userAccountsDto.id,
+                account: account.account,
+                bank: normalizedBank
+            });
+
+            return this.financeService.getProductsForAccount(
                 userAccountsDto.id,
                 account.account,
                 account.token_password,
                 normalizedBank
-            )
-        );
+            ).pipe(
+                tap(response => {
+                    console.log('Respuesta para cuenta:', account.account, JSON.stringify(response, null, 2));
+                })
+            );
+        });
 
-        console.log('requests', requests);
         return forkJoin(requests);
     }
+
 
 }
