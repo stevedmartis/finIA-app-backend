@@ -1,6 +1,8 @@
 import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import { WebSocketServer } from '@nestjs/websockets';
 import { forkJoin, Observable, tap } from 'rxjs';
+import { FinanceGateway } from 'src/socket/socket.gateway';
 import { UserCredentialDto } from './dto/floid-credential.dto';
 import { FloidAccountWidgetDto } from './dto/floid-widget.dto';
 
@@ -11,7 +13,10 @@ import { IFloidAccountWidget } from './models/floid-account-summary';
 
 @Controller('finance')
 export class FinanceController {
-    constructor(private financeService: FinanceService) { }
+
+    constructor(private financeService: FinanceService, private financeGateway: FinanceGateway) {
+
+    }
 
     // ╔═╗╦ ╦╔╦╗╦ ╦╔═╗╔╗╔╔╦╗╦╔═╗╔═╗╔╦╗╔═╗
     // ╠═╣║ ║ ║ ╠═╣║╣ ║║║ ║ ║║  ╠═╣ ║ ║╣
@@ -82,6 +87,32 @@ export class FinanceController {
         });
 
         return forkJoin(requests);
+    }
+
+    @Post('transactions-callback')
+    async handleTransactionsCallback(@Body() data: any) {
+        console.log('Transacciones recibidas desde Floid:', data);
+
+        try {
+            // Procesar los datos de transacciones recibidos
+            const transactions = this.processTransactionData(data);
+
+            // Notificar al front-end a través de WebSockets
+            this.financeGateway.sendTransactionsUpdate(transactions);
+
+            return { success: true, message: 'Callback procesado correctamente' };
+        } catch (error) {
+            console.error('Error procesando callback de transacciones:', error);
+            throw new HttpException(
+                'Error procesando callback de transacciones',
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    private processTransactionData(data: any): any[] {
+        // Lógica para procesar los datos de transacciones recibidos
+        return data.transactions;
     }
 
 
