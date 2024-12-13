@@ -1,12 +1,10 @@
 module.exports = {
     apps: [{
-            name: 'finIA-app-backend',
-            script: 'npm',
-            args: 'start',
-            interpreter: 'none',
-            env: {
-                NODE_ENV: 'production',
-            },
-        }],
-};
-//# sourceMappingURL=ecosystem.config.js.map
+        name: "finIA-app-backend",
+        script: "./dist/main.js",
+        watch: false,
+        env: {
+            NODE_ENV: "production",
+        }
+    }]
+}
