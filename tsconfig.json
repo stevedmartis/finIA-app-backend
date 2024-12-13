@@ -30,7 +30,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "ecosystem.config.js",
+    "src/ecosystem.config.js",
     "**/*.spec.ts"
   ]
 }
