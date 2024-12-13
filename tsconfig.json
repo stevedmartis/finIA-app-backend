@@ -26,11 +26,11 @@
   },
   "include": [
     "src/**/*"
-  ],
+, "ecosystem.config.js"  ],
   "exclude": [
     "node_modules",
     "dist",
-    "src/ecosystem.config.js",
+    "ecosystem.config.js",
     "**/*.spec.ts"
   ]
 }
