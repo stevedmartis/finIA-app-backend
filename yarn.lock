@@ -1188,7 +1188,7 @@
   dependencies:
     tslib "2.6.2"
 
-"@nestjs/websockets@^10.0.0":
+"@nestjs/websockets@^10.0.0", "@nestjs/websockets@^10.4.15":
   version "10.4.15"
   resolved "https://registry.npmjs.org/@nestjs/websockets/-/websockets-10.4.15.tgz"
   integrity sha512-OmCUJwvtagzXfMVko595O98UI3M9zg+URL+/HV7vd3QPMCZ3uGCKSq15YYJ99LHJn9NyK4e4Szm2KnHtUg2QzA==
